@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.nowcoder.community.mapper.DiscussPostMapper">
+
+    <!--提取sql片段-->
+    <sql id="selectFields">
+          id, user_id, title, content, type, status, create_time, comment_count, score
+    </sql>
+
+    <sql id="insertFields">
+        user_id, title, content, type, status, create_time, comment_count, score
+    </sql>
+
+    <!--type有两种0,1 0普通帖子 1是置顶所以倒序将置顶的帖子放入前面
+        按照时间排序
+        status有0,1,2 2表示拉黑的帖子 -->
+    <select id="selectDiscussPosts" resultType="DiscussPost">
+        select
+        <include refid="selectFields"></include>
+        from discuss_post
+        where status !=2
+        <if test="userId!=0">
+            and user_id = #{userId}
+        </if>
+        order by type desc, create_time desc
+        limit #{offset},#{limit}
+    </select>
+
+    <select id="selectDiscussPostRows" resultType="int">
+        select count(id)
+        from discuss_post
+        where status !=2
+        <if test="userId!=0">
+            and user_id = #{userId}
+        </if>
+    </select>
+
+</mapper>
